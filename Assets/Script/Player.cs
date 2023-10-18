@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     {
         // GameObject go = GameObject.Find("@Managers");
         // Managers mg = go.GetComponent<Managers>();
-        Managers mg = Managers.Instance;
+        // Managers mg = Managers.Instance;
     }
 
     // Update is called once per frame
