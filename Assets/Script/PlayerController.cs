@@ -28,6 +28,19 @@ using UnityEngine;
 //     } 
 // }
 
+// class Tank {
+//     public float speed = 10.0f;
+//     Passenger passenger; // 포함관계 Nested(중첩된) Prefab(Pre-Fabrication)
+// }
+
+// class FastTank: Tank {
+
+// }
+
+// class Passenger {
+
+// }
+
 
 public class PlayerController : MonoBehaviour
 {
