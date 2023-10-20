@@ -17,6 +17,6 @@ public class PrefabTest : MonoBehaviour
 
         tank = Managers.Resource.Instantiate("Tank");
 
-        Managers.Resource.Destroy(tank, 3.0f);
+        // Managers.Resource.Destroy(tank, 3.0f);
     }
 }
