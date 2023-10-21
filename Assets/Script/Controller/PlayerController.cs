@@ -76,11 +76,7 @@ public class PlayerController : MonoBehaviour
     // Transform
     // PlayerController (*)
     float _yAngle = 0.0f;
-    float wait_run_ratio = 0;
-    bool isJumping;
-    bool isFalling;
-    bool isSkillCasting;
-    bool isSkillChanneling;
+    // float wait_run_ratio = 0;
 
     public enum PlayerState {
         Die,
@@ -110,18 +106,24 @@ public class PlayerController : MonoBehaviour
 
     void UpdateIdle()
     {
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0.0f, 10.0f * Time.deltaTime);
+        // wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0.0f, 10.0f * Time.deltaTime);
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
-        anim.Play("WAIT_RUN");
+        // anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        // anim.Play("WAIT_RUN");
+
+        // 현재 게임 상태에 대한 정보를 넘겨준다.
+        anim.SetFloat("speed", 0);
     }
 
     void UpdateMoving()
     {
-        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1.0f, 10.0f * Time.deltaTime);
+        // wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1.0f, 10.0f * Time.deltaTime);
         Animator anim = GetComponent<Animator>();
-        anim.SetFloat("wait_run_ratio", wait_run_ratio);
-        anim.Play("WAIT_RUN");
+        // anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        // anim.Play("WAIT_RUN");
+
+        // 현재 게임 상태에 대한 정보를 넘겨준다.
+        anim.SetFloat("speed", _speed);
     }
 
     PlayerState _state = PlayerState.Idle;
@@ -260,8 +262,6 @@ public class PlayerController : MonoBehaviour
         }
 
         // _moveToDest = false;
-        _state = PlayerState.Idle;
-        UpdateState(_state);
     }
 
     void OnMouseClicked(Define.MouseEvnet evt)
