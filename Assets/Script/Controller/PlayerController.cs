@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // 1. ds위치 벡터
@@ -75,6 +76,55 @@ public class PlayerController : MonoBehaviour
     // Transform
     // PlayerController (*)
     float _yAngle = 0.0f;
+    float wait_run_ratio = 0;
+    bool isJumping;
+    bool isFalling;
+    bool isSkillCasting;
+    bool isSkillChanneling;
+
+    public enum PlayerState {
+        Die,
+        Moving,
+        Idle,
+        Jumping,
+    }
+
+    void UpdateState(PlayerState state) {
+        switch (state) {
+            case PlayerState.Die:
+                UpdateDie();
+                break;
+            case PlayerState.Moving:
+                UpdateMoving();
+                break;
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
+            default:
+                break;
+        }
+    }
+    void UpdateDie() {
+
+    }
+
+    void UpdateIdle()
+    {
+        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0.0f, 10.0f * Time.deltaTime);
+        Animator anim = GetComponent<Animator>();
+        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.Play("WAIT_RUN");
+    }
+
+    void UpdateMoving()
+    {
+        wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1.0f, 10.0f * Time.deltaTime);
+        Animator anim = GetComponent<Animator>();
+        anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        anim.Play("WAIT_RUN");
+    }
+
+    PlayerState _state = PlayerState.Idle;
     void Update()
     {
         // Local -> Global
@@ -125,12 +175,14 @@ public class PlayerController : MonoBehaviour
         // =================================================================
         // transform
 
-        if (_moveToDest) {
+        // if (_moveToDest) {
+        if (_state == PlayerState.Moving) {
             Vector3 dir = _destPos - transform.position;
 
             // 도착 상태
             if (dir.magnitude < 0.0001f) {
-                _moveToDest = false;
+                // _moveToDest = false;
+                _state = PlayerState.Idle;
             } else {
                 float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
                 
@@ -139,10 +191,42 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
             }
         }
+
+        // if (_moveToDest) {
+        //     wait_run_ratio = Mathf.Lerp(wait_run_ratio, 1.0f, 10.0f * Time.deltaTime);
+        //     Animator anim = GetComponent<Animator>();
+        //     anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        //     // anim.Play("RUN");
+        //     anim.Play("WAIT_RUN");
+        // } else {
+        //     wait_run_ratio = Mathf.Lerp(wait_run_ratio, 0.0f, 10.0f * Time.deltaTime);
+        //     Animator anim = GetComponent<Animator>();
+        //     anim.SetFloat("wait_run_ratio", wait_run_ratio);
+        //     // anim.Play("WAIT");
+        //     anim.Play("WAIT_RUN");
+        // }
+
+        switch (_state) {
+            case PlayerState.Die:
+                UpdateDie();
+                break;
+            case PlayerState.Moving:
+                UpdateMoving();
+                break;
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
+            default:
+                break;
+        }
     }
 
     void OnKeyBoard()
     {
+        if (_state == PlayerState.Die) {
+            return;
+        }
+
         if (Input.GetKey(KeyCode.W))
         {
             // transform.position += transform.TransformDirection(Vector3.forward * Time.deltaTime * _speed);
@@ -175,13 +259,18 @@ public class PlayerController : MonoBehaviour
             transform.Translate(Vector3.forward * Time.deltaTime * _speed);
         }
 
-        _moveToDest = false;
+        // _moveToDest = false;
+        _state = PlayerState.Idle;
+        UpdateState(_state);
     }
 
     void OnMouseClicked(Define.MouseEvnet evt)
     {
-        if (evt != Define.MouseEvnet.Click)
-        {
+        // if (evt != Define.MouseEvnet.Click)
+        // {
+        //     return;
+        // }
+        if (_state == PlayerState.Die) {
             return;
         }
 
@@ -194,7 +283,8 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 100.0f, mask))
         {
             _destPos = hit.point;
-            _moveToDest = true;
+            // _moveToDest = true;
+            _state = PlayerState.Moving;
         }
     }
 }
