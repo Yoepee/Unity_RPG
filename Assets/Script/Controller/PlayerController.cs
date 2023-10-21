@@ -46,6 +46,9 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     float _speed = 10.0f;
+
+    bool _moveToDest = false;
+    Vector3 _destPos;
     void Start()
     {
         // MyVector pos = new MyVector(0.0f, 10.0f, 0.0f);
@@ -58,17 +61,19 @@ public class PlayerController : MonoBehaviour
         // MyVector newPos = from + dir * _speed;
 
         // 방향 벡터
-            // 1. 거리 (크기) 5 magnitude
-            // 2. 실제 방향 -> normalized
-        
+        // 1. 거리 (크기) 5 magnitude
+        // 2. 실제 방향 -> normalized
+
         // Input 리스너 패턴
         Managers.Input.KeyAction -= OnKeyBoard;
         Managers.Input.KeyAction += OnKeyBoard;
+        Managers.Input.MouseAction -= OnMouseClicked;
+        Managers.Input.MouseAction += OnMouseClicked;
     }
 
     // GameObject(Player)
-        // Transform
-        // PlayerController (*)
+    // Transform
+    // PlayerController (*)
     float _yAngle = 0.0f;
     void Update()
     {
@@ -96,7 +101,7 @@ public class PlayerController : MonoBehaviour
         //     transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
         //     transform.Translate(Vector3.forward * Time.deltaTime * _speed);
         // }
-        
+
         // if (Input.GetKey(KeyCode.S)) {
         //     // transform.position += transform.TransformDirection(Vector3.back * Time.deltaTime * _speed);
         //     // transform.rotation = Quaternion.LookRotation(Vector3.back);
@@ -119,35 +124,77 @@ public class PlayerController : MonoBehaviour
         // }
         // =================================================================
         // transform
+
+        if (_moveToDest) {
+            Vector3 dir = _destPos - transform.position;
+
+            // 도착 상태
+            if (dir.magnitude < 0.0001f) {
+                _moveToDest = false;
+            } else {
+                float moveDist = Mathf.Clamp(_speed * Time.deltaTime, 0, dir.magnitude);
+                
+                transform.position = transform.position + dir.normalized * moveDist;
+                // transform.LookAt(_destPos);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+            }
+        }
     }
 
-    void OnKeyBoard() {
-        if (Input.GetKey(KeyCode.W)) {
+    void OnKeyBoard()
+    {
+        if (Input.GetKey(KeyCode.W))
+        {
             // transform.position += transform.TransformDirection(Vector3.forward * Time.deltaTime * _speed);
             // transform.rotation = Quaternion.LookRotation(Vector3.forward);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
             transform.Translate(Vector3.forward * Time.deltaTime * _speed);
         }
-        
-        if (Input.GetKey(KeyCode.S)) {
+
+        if (Input.GetKey(KeyCode.S))
+        {
             // transform.position += transform.TransformDirection(Vector3.back * Time.deltaTime * _speed);
             // transform.rotation = Quaternion.LookRotation(Vector3.back);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
             transform.Translate(Vector3.forward * Time.deltaTime * _speed);
         }
 
-        if (Input.GetKey(KeyCode.A)) {
+        if (Input.GetKey(KeyCode.A))
+        {
             // transform.position += transform.TransformDirection(Vector3.left * Time.deltaTime * _speed); 
             // transform.rotation = Quaternion.LookRotation(Vector3.left);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
             transform.Translate(Vector3.forward * Time.deltaTime * _speed);
         }
 
-        if (Input.GetKey(KeyCode.D)) {
+        if (Input.GetKey(KeyCode.D))
+        {
             // transform.position += transform.TransformDirection(Vector3.right * Time.deltaTime * _speed); 
             transform.rotation = Quaternion.LookRotation(Vector3.right);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
             transform.Translate(Vector3.forward * Time.deltaTime * _speed);
+        }
+
+        _moveToDest = false;
+    }
+
+    void OnMouseClicked(Define.MouseEvnet evt)
+    {
+        if (evt != Define.MouseEvnet.Click)
+        {
+            return;
+        }
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit hit;
+
+        LayerMask mask = LayerMask.GetMask("Wall");
+        // int mask = (1 << 8) | (1 << 9);
+        if (Physics.Raycast(ray, out hit, 100.0f, mask))
+        {
+            _destPos = hit.point;
+            _moveToDest = true;
         }
     }
 }

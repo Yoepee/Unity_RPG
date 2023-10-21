@@ -52,6 +52,7 @@ public class TestCollision : MonoBehaviour
         // Debug.Log(Camera.main.ScreenToViewportPoint(Input.mousePosition)); // Viewport
 
         // GameObject.FindGameObjectsWithTag("Monster");
+        return;
 
         if (Input.GetMouseButtonDown(0))
         {
