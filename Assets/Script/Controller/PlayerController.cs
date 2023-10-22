@@ -72,6 +72,10 @@ public class PlayerController : MonoBehaviour
         Managers.Input.MouseAction += OnMouseClicked;
     }
 
+    void OnRunEvent(int a) {
+        Debug.Log($"뚜벅 뚜벅! @{a}");
+    }
+
     // GameObject(Player)
     // Transform
     // PlayerController (*)
